@@ -1,5 +1,7 @@
 package com.vivek.employee101.controller;
 
+import com.vivek.employee101.exceptions.ProductAlreadyExistsException;
+import com.vivek.employee101.exceptions.ProductDoesNotExistsException;
 import com.vivek.employee101.model.Employee;
 import com.vivek.employee101.service.EmployeeService;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +45,7 @@ public class EmployeeController {
             @ApiResponse(code = 500,  message = "USER NOT FOUND")})
 
     @GetMapping("/employee/{id}")
-    public ResponseEntity<Employee> getEmployees(@PathVariable Long id){
+    public ResponseEntity<Employee> getEmployees(@PathVariable Long id) throws ProductDoesNotExistsException{
         return new ResponseEntity<>(employeeService.getEmployees(id), HttpStatus.OK);
     }
 //   Getting employee by employee id END
@@ -52,10 +54,11 @@ public class EmployeeController {
     @ApiOperation(value = "Add an employee", response = Employee.class)
     @ApiResponses (value = {
             @ApiResponse(code = 201,  message = "EMPLOYEE SUCCESSFULLY CREATED",        response = Employee.class),
-            @ApiResponse(code = 404,  message = "NOT FOUND")})
+            @ApiResponse(code = 404,  message = "NOT FOUND"),
+            @ApiResponse(code = 500,  message = "USER ALREADY PRESENT")})
 
     @PostMapping("/employee/add")
-    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee){
+    public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) throws ProductAlreadyExistsException {
         return new ResponseEntity<>(employeeService.addEmployee(employee),HttpStatus.CREATED);
     }
 //   Add an employee END
@@ -64,11 +67,12 @@ public class EmployeeController {
     @ApiOperation(value = "Update an employee", response = Employee.class)
     @ApiResponses (value = {
             @ApiResponse(code = 200,  message = "EMPLOYEE SUCCESSFULLY UPDATED",        response = Employee.class),
-            @ApiResponse(code = 404,  message = "NOT FOUND")})
+            @ApiResponse(code = 404,  message = "NOT FOUND"),
+            @ApiResponse(code = 500,  message = "USER NOT FOUND")})
 
     @PatchMapping("/employee/update")
-    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee){
-        return new ResponseEntity<>(employeeService.addEmployee(employee),HttpStatus.OK);
+    public ResponseEntity<Employee> updateEmployee(@RequestBody Employee employee) throws ProductDoesNotExistsException{
+        return new ResponseEntity<>(employeeService.updateEmployee(employee),HttpStatus.OK);
     }
 //   Update an employee END
 
@@ -76,12 +80,14 @@ public class EmployeeController {
     @ApiOperation(value = "Delete an employee based on id", response = HttpStatus.class)
     @ApiResponses (value = {
             @ApiResponse(code = 200,  message = "EMPLOYEE SUCCESSFULLY DELETED",        response = Employee.class),
-            @ApiResponse(code = 404,  message = "NOT FOUND")})
+            @ApiResponse(code = 404,  message = "NOT FOUND"),
+            @ApiResponse(code = 500,  message = "USER NOT FOUND")})
 
     @DeleteMapping("/employee/delete/{id}")
-    public ResponseEntity<Employee> deleteEmployee(@PathVariable Long id){
-        employeeService.deleteEmployee(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<Employee> deleteEmployee(@PathVariable Long id) throws ProductDoesNotExistsException{
+        Employee deletedEmployee = employeeService.deleteEmployee(id);
+
+        return new ResponseEntity<Employee>(deletedEmployee, HttpStatus.OK);
     }
 //   Delete an employee END
 }
