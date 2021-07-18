@@ -1,7 +1,7 @@
 package com.vivek.employee101.service;
 
-import com.vivek.employee101.exceptions.ProductAlreadyExistsException;
-import com.vivek.employee101.exceptions.ProductDoesNotExistsException;
+import com.vivek.employee101.exceptions.EmployeeAlreadyExistsException;
+import com.vivek.employee101.exceptions.EmployeeDoesNotExistsException;
 import com.vivek.employee101.model.Employee;
 import com.vivek.employee101.repository.EmployeeRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -78,7 +78,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void canGetEmployeeByIdWhenEmployeePresent() throws ProductDoesNotExistsException{
+    void canGetEmployeeByIdWhenEmployeePresent() throws EmployeeDoesNotExistsException {
         Mockito.when(employeeRepository.findById(employee1.getId())).thenReturn(Optional.ofNullable(employee1));
         Employee capturedEmployee = employeeService.getEmployees(employee1.getId());
         assertThat(capturedEmployee).isEqualTo(employee1);
@@ -86,7 +86,7 @@ class EmployeeServiceTest {
 
 
     @Test
-    void canAddEmployeeIfNotExists() throws ProductAlreadyExistsException {
+    void canAddEmployeeIfNotExists() throws EmployeeAlreadyExistsException {
         //stubbing
         when(employeeRepository.save(any())).thenReturn(employee1);
         Employee capturedEmployee = employeeService.addEmployee(employee1);
@@ -96,15 +96,15 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void canAddEmployeeIfExists() throws ProductAlreadyExistsException {
+    void canAddEmployeeIfExists() throws EmployeeAlreadyExistsException {
         //stubbing
         when(employeeRepository.findById(employee1.getId())).thenReturn(Optional.ofNullable(employee1));
-        assertThrows(ProductAlreadyExistsException.class, () -> employeeService.addEmployee(employee1));
+        assertThrows(EmployeeAlreadyExistsException.class, () -> employeeService.addEmployee(employee1));
         verify(employeeRepository,times(1)).findById(employee1.getId());
     }
 
     @Test
-    void canUpdateEmployeeIfExists() throws ProductDoesNotExistsException {
+    void canUpdateEmployeeIfExists() throws EmployeeDoesNotExistsException {
         //stubbing
         when(employeeRepository.findById(employee1.getId())).thenReturn(Optional.ofNullable(employee1));
         when(employeeRepository.save(any())).thenReturn(employee1);
@@ -114,13 +114,13 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void canUpdateEmployeeIfDoesNotExists() throws ProductDoesNotExistsException {
-        assertThrows(ProductDoesNotExistsException.class, () -> employeeService.updateEmployee(employee1));
+    void canUpdateEmployeeIfDoesNotExists() throws EmployeeDoesNotExistsException {
+        assertThrows(EmployeeDoesNotExistsException.class, () -> employeeService.updateEmployee(employee1));
         verify(employeeRepository,times(1)).findById(employee1.getId());
     }
 
     @Test
-    void canDeleteEmployeeIfExists() throws ProductDoesNotExistsException {
+    void canDeleteEmployeeIfExists() throws EmployeeDoesNotExistsException {
         //stubbing
         when(employeeRepository.findById(employee1.getId())).thenReturn(Optional.ofNullable(employee1));
         doNothing().when(employeeRepository).deleteById(employee1.getId());
@@ -135,8 +135,8 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void canNotDeleteEmployeeIfDoesNotExists() throws ProductDoesNotExistsException {
-        assertThrows(ProductDoesNotExistsException.class, () -> employeeService.deleteEmployee(employee1.getId()));
+    void canNotDeleteEmployeeIfDoesNotExists() throws EmployeeDoesNotExistsException {
+        assertThrows(EmployeeDoesNotExistsException.class, () -> employeeService.deleteEmployee(employee1.getId()));
         verify(employeeRepository,times(1)).findById(employee1.getId());
     }
 
