@@ -5,12 +5,12 @@ import io.swagger.annotations.ApiModelProperty;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity
+@Entity //POJO |  An entity represents a table stored in a database.
 public class Employee {
-
+//The @ApiParam annotation is for the parameters of an API resource request, whereas @ApiModelProperty is for properties of the model.
 
     @ApiModelProperty(notes = "Id of an Employee", name ="id", required = true, value = "1040222")
-    @Id
+    @Id //STATING THAT ITS THE PRIMARY KEY HERE.
     private Long   id;
 
     @ApiModelProperty(notes = "Name of an Employee", name ="name", required = true, value = "Vivek Singh")
