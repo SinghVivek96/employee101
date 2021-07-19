@@ -1,0 +1,85 @@
+package com.vivek.employee101.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+
+import static com.vivek.employee101.security.ApplicationUserRole.ADMIN;
+import static com.vivek.employee101.security.ApplicationUserRole.EMPLOYEE;
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private final PasswordEncoder passwordEncoder;
+
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests()
+                .antMatchers("/", "index", "/css/*", "/js/*").hasAnyRole(ADMIN.name(),EMPLOYEE.name())
+                .antMatchers("/swagger-ui.html/**").hasAnyRole(ADMIN.name(),EMPLOYEE.name())
+                .antMatchers("/employee/add").hasRole(ADMIN.name())
+                .antMatchers("/employee/update").hasRole(ADMIN.name())
+                .antMatchers("/employee/delete/*").hasRole(ADMIN.name())
+                .antMatchers("/employee").hasAnyRole(ADMIN.name(),EMPLOYEE.name())
+                .antMatchers("/actuator/**").hasRole(ADMIN.name())
+
+                .anyRequest()
+                .authenticated()
+                .and()
+                .httpBasic();
+    }
+
+//    @Override
+//    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
+//        auth.authenticationProvider(daoAuthenticationProvider());
+//    }
+
+
+//    @Override
+//    @Bean
+//    public DaoAuthenticationProvider daoAuthenticationProvider(){
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+//        provider.setPasswordEncoder(passwordEncoder);
+//        provider.setUserDetailsService(applicationUserService);
+//        return provider;
+//    }
+
+    @Override
+    @Bean
+    protected UserDetailsService userDetailsService() {
+        UserDetails annaSmithUser = User.builder()
+                .username("employee")
+                .password(passwordEncoder.encode("employee"))
+                .roles(EMPLOYEE.name()) // ROLE_STUDENT
+                .build();
+
+        UserDetails lindaUser = User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("admin"))
+                .roles(ADMIN.name()) // ROLE_ADMIN
+                .build();
+
+        return new InMemoryUserDetailsManager(
+                annaSmithUser,
+                lindaUser
+        );
+    }
+}
