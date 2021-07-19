@@ -67,7 +67,6 @@ class EmployeeServiceTest {
 
     @Test
     void canGetAllEmployees() {
-        employeeRepository.save(employee1);
         //stubbing mock to return specific data
         when(employeeRepository.findAll()).thenReturn(employeeList);
         List<Employee> capturedEmployeeList = employeeService.getEmployees();
